@@ -8,8 +8,8 @@ namespace MinimalApiAuth.Repositories
         {
             var users = new List<User>
             {
-                new User { Id = 1, Username = "batman", Password = "batman", Role = "manager" },
-                new User { Id = 2, Username = "robin", Password = "robin", Role = "employee" }
+                new User { Id = 1, Username = "paulo", Password = "", Role = "manager" },
+                new User { Id = 2, Username = "samuel", Password = "", Role = "employee" }
             };
             return users.Where(x => x.Username.ToLower() == username.ToLower() && x.Password == x.Password).FirstOrDefault();
         }

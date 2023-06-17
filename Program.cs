@@ -27,11 +27,7 @@ builder.Services.AddAuthentication(x =>
             ValidateAudience = false
         };
     });
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("Admin", policy => policy.RequireRole("manager"));
-    options.AddPolicy("Employee", policy => policy.RequireRole("employee"));
-});
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -54,24 +50,6 @@ app.MapPost("/login", (User model) =>
         user = user,
         token = token
     });
-});
 
-
-app.MapGet("/anonymous", () => { Results.Ok("anonymous"); });
-
-app.MapGet("/authenticated", (ClaimsPrincipal user) =>
-{
-    Results.Ok(new { message = $"Authenticated as {user.Identity.Name}" });
 }).RequireAuthorization();
-
-app.MapGet("/employee", (ClaimsPrincipal user) =>
-{
-    Results.Ok(new { message = $"Authenticated as {user.Identity.Name}" });
-}).RequireAuthorization("Employee");
-
-app.MapGet("/manager", (ClaimsPrincipal user) =>
-{
-    Results.Ok(new { message = $"Authenticated as {user.Identity.Name}" });
-}).RequireAuthorization("Admin");
-
 app.Run();
