@@ -51,12 +51,14 @@ app.MapPost("/login", (User user) =>
 {
     var userSalvo = UserRepository.Salvar(user);
 
+    if (userSalvo == null)
+        return Results.NotFound(new { message = "Invalid username or password" });
+
     usuarios.InsertOne(userSalvo);
     Console.WriteLine(userSalvo);
 
 
     var token = TokenService.GenerateToken(user);
-
 
     return Results.Ok(new
     {
