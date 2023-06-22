@@ -4,14 +4,11 @@ namespace MinimalApiAuth.Repositories
 {
     public static class UserRepository
     {
-        public static User Get(string username, string password)
+        public static User Salvar(User user)
         {
-            var users = new List<User>
-            {
-                new User { Id = 1, Username = "paulo", Password = "", Role = "manager" },
-                new User { Id = 2, Username = "samuel", Password = "", Role = "employee" }
-            };
-            return users.Where(x => x.Username.ToLower() == username.ToLower() && x.Password == x.Password).FirstOrDefault();
+            Console.WriteLine("Salvando " + user.Username);
+            var novoUser = new User(user.Id, user.Username, user.Password);
+            return novoUser;
         }
     }
 }

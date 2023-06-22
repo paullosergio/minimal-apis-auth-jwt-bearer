@@ -4,27 +4,26 @@ using MinimalApiAuth;
 using MinimalApiAuth.Models;
 using MinimalApiAuth.Repositories;
 using MongoDB.Driver;
-using System.Security.Claims;
 using System.Text;
 
-// New instance of CosmosClient class
-MongoClient client = new MongoClient(Environment.GetEnvironmentVariable("MONGO_CONNECTION"));
 
-// Database reference with creation if it does not already exist
-var db = client.GetDatabase("adventure");
+var builder = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json");
+IConfigurationRoot config = builder.Build();
 
-// Container reference with creation if it does not alredy exist
-var _users = db.GetCollection<Product>("users");
+MongoClient client = new MongoClient(
+                config.GetSection("MongoDB:ConexaoCatalogo").Value);
+IMongoDatabase db = client.GetDatabase("DBUser");
+
+var usuarios = db.GetCollection<User>("Usuários");
+
 
 var key = Encoding.ASCII.GetBytes(Settings.Secret);
 
-var builder = WebApplication.CreateBuilder(args);
+var builders = WebApplication.CreateBuilder(args);
 
-//// Add services to the container.
-//builder.Services.Configure<UserDatabaseSettings>(
-//    builder.Configuration.GetSection("UserStoreDatabase"));
 
-builder.Services.AddAuthentication(x =>
+builders.Services.AddAuthentication(x =>
 {
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -41,34 +40,30 @@ builder.Services.AddAuthentication(x =>
             ValidateAudience = false
         };
     });
-builder.Services.AddAuthorization();
+builders.Services.AddAuthorization();
 
-var app = builder.Build();
+var app = builders.Build();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapPost("/login", (User model) =>
+app.MapPost("/login", (User user) =>
 {
-    var user = UserRepository.Get(model.Username, model.Password);
-    _users.InsertOne(new Product(1,
-        "Phelps",
-        26,
-        "paulomg1996@gmail.com"
-     ));
+    var userSalvo = UserRepository.Salvar(user);
 
-    if (user == null)
-        return Results.NotFound(new { message = "Invalid username or password" });
+    usuarios.InsertOne(userSalvo);
+    Console.WriteLine(userSalvo);
+
 
     var token = TokenService.GenerateToken(user);
 
-    user.Password = "";
 
     return Results.Ok(new
     {
         user = user,
-        token = token
+        token = token,
     });
-
 }).RequireAuthorization();
+
+
 app.Run();

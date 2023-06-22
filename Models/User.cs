@@ -1,11 +1,7 @@
-﻿namespace MinimalApiAuth.Models
+﻿using MongoDB.Bson;
+
+namespace MinimalApiAuth.Models
+
 {
-    public class User
-    {
-       
-        public int Id { get; set; }
-        public string? Username { get; set; } = null;
-        public string? Password { get; set; } = null;
-        public string? Role { get; set; } = null;
-    }
+    public record User (int Id, string Username, int Password);
 }
